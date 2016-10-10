@@ -1,49 +1,212 @@
-/*Collapsible Tree*/
+/* CSS reset */
+/*
+   http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* Collapsible Tree */
 .node {
     cursor: pointer;
 }
-
 .overlay{
-    background-color:#EEE;
+    background-color:#d1dbbd;
 }
-
 .node circle {
     fill: #fff;
     stroke: steelblue;
     stroke-width: 1.5px;
 }
-
 .node text {
     font-size:10px;
-    font-family:sans-serif;
+    font-family: helvetica, sans-serif;
 }
-
 .link {
     fill: none;
-    stroke: #ccc;
+    stroke: #91aa9d;
     stroke-width: 1.5px;
 }
-
 .templink {
     fill: none;
     stroke: red;
     stroke-width: 3px;
 }
-
 .ghostCircle.show{
     display:block;
 }
-
 .ghostCircle, .activeDrag .ghostCircle{
     display: none;
 }
 
+/* Font */
+@font-face {
+    font-family: 'nevis';
+    src: url('font/nevis.ttf');
+}
 
+/* CSS */
 html, body{
     height:100%;
 }
+body{
+    font-size: 62.5%;
+    font-family: helvetica, sans-serif;
+    color: #193441;
+    background-color: #fcfff5;
+}
+
+header{
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    font-family: nevis;
+    color: #3e606f;
+}
+header h1{
+    font-size: 4em;
+    color: #193441;
+    margin-top: 0.3em;
+    margin-bottom: 0.15em;
+}
+header h2{
+    color: #3e606f;
+    font-size: 1.2em;
+}
+
+#detail{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 50em;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #fcfff5;
+}
+
+#detail h1{
+    font-size: 3em;
+    font-family: nevis;
+    margin-top: 0.5em;
+    margin-left: 0.5em;
+    margin-bottom: 0.5em;
+    width: 100%;
+    text-align: center;
+}
+
+#backToTop{
+    height: 2.5em;
+    cursor: pointer;
+    margin-top: 1.8em;
+}
+#backToTop:hover{
+    transform: translateY(-0.5em);
+    -ms-transform: translateY(-0.5em);
+    -webkit-transform: translateY(-0.5em);
+    -moz-transform: translateY(-0.5em);
+
+    transition-duration: 0.2s;
+    -webkit-transition-duration: 0.2s;
+}
+
+.eventImg{
+    height: 15em;
+    margin-left: 100%;
+    margin-right: 100%;
+    border-radius: 1em;
+}
+
+#detail li{
+    margin-top: 1em;
+    font-size: 1.3em;
+    line-height: 1.3em;
+}
+#detail span{
+    font-weight: bold;
+}
+
+.disabled{
+    margin-top: 2em;
+    margin-bottom: 2em;
+    width: 100%;
+    display: flex;
+    //justify-content: center;
+}
+.disabled img{
+    height: 5em;
+    margin-left: 1em;
+    margin-right: 2em;
+}
+
+#toggleWC{
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0.5em;
+    font-size: 1.4em;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: .4em;
+    border: 1px #193441 solid;
+    border-radius: .2em;
+    background-color: #91aa9d;
+}
+#toggleWC:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
 
 #map-canvas{
-    width: 500px;
-    height: 500px;
+    width: 50em;
+    height: 50em;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10em;
+}
+
+@media only screen and (max-width: 50em) {
+    #detail, #map-canvas{
+        width: 100%;
+    }
 }

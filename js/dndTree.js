@@ -180,8 +180,8 @@ function dndTree(treeData){
 
 
     // Define the drag listeners for drag/drop behaviour of nodes.
-    dragListener = d3.behavior.drag()
-        .on("dragstart", function(d) {
+    dragListener = d3.behavior.drag();
+    /*    .on("dragstart", function(d) {
             if (d == root) {
                 return;
             }
@@ -256,6 +256,7 @@ function dndTree(treeData){
                 endDrag();
             }
         });
+    */
 
     function endDrag() {
         selectedNode = null;
@@ -332,7 +333,7 @@ function dndTree(treeData){
         scale = zoomListener.scale();
         x = -source.y0;
         y = -source.x0;
-        x = x * scale + viewerWidth / 2;
+        x = x * scale + viewerWidth / 4;
         y = y * scale + viewerHeight / 2;
         d3.select('g').transition()
             .duration(duration)
@@ -394,7 +395,7 @@ function dndTree(treeData){
 
         // Set widths between levels based on maxLabelLength.
         nodes.forEach(function(d) {
-            d.y = (d.depth * (maxLabelLength * 10)); //maxLabelLength * 10px
+            d.y = (d.depth * (maxLabelLength * 5)); //maxLabelLength * 10px
             // alternatively to keep a fixed scale one can set a fixed depth per level
             // Normalize for fixed-depth by commenting out below line
             // d.y = (d.depth * 500); //500px per level.
@@ -466,7 +467,7 @@ function dndTree(treeData){
         node.select("circle.nodeCircle")
             .attr("r", 4.5)
             .style("fill", function(d) {
-                return d._children ? "lightsteelblue" : "#fff";
+                return d._children ? "lightsteelblue" : "#fcfff5";
             });
 
         // Transition nodes to their new position.
@@ -548,6 +549,11 @@ function dndTree(treeData){
     root = treeData;
     root.x0 = viewerHeight / 2;
     root.y0 = 0;
+
+    // Collapse all children of roots children before rendering.
+    root.children.forEach(function(child){
+        collapse(child);
+    });
 
     // Layout the tree initially and center on the root node.
     update(root);

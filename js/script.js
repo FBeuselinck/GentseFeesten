@@ -1,10 +1,11 @@
 //http://datatank.stad.gent/4/toerisme/gentsefeestenevents.json
 
 var url = "http://datatank.stad.gent/4/toerisme/gentsefeestenevents.json";
+var googleMap;
+var boolWC = false;
 
-$.getJSON("data/testEvents.json", function( data ) {
+$.getJSON("data/events.json", function( data ) {
     var uniqueData = filterData(data);
-    //d3SimpleTable(uniqueData);
     dndTree(refactorData(uniqueData));
 });
 
@@ -107,38 +108,56 @@ function addEventsToDevision(devision, data, prop){
 }
 
 function viewDetail(event){
+    //vorig event verwijderen
     $("#detail").empty();
+    boolWC = false;
+
+    //detail opvullen
+    $("#detail").append(
+        $("<img src='image/back-to-top.png' id='backToTop'/>")
+    );
     $("#detail").append(
         $("<h1>" + event.titel + "</h1>")
-    ).append(
+    );
+    if(event.afbeelding){
+        $("#detail").append(
+            $("<img src=" + event.afbeelding + " class='eventImg'/>")
+        );
+    }
+    $("#detail").append(
         $("<ul>").append(
-            $("<li>" + "Omschrijving: " + event.omschrijving + "</li>")
+            $("<li>" + "<span>" + "Omschrijving: " + "</span>" + event.omschrijving + "</li>")
         ).append(
-            $("<li>" + "Organisatie: " + event.organisatie + "</li>")
+            $("<li>" + "<span>Organisatie: </span>" + event.organisatie + "</li>")
         ).append(
-            $("<li>...</li>")
+            $("<li>" + "<span>Categorie: </span>" + event.categorie_naam + "</li>")
+        ).append(
+            $("<li>" + "<span>Datum: </span>" + event.datum + "</li>")
+        ).append(
+            $("<li>" + "<span>URL: </span>" + "<a href=" + event.url + ">" + event.url + "</a>" + "</li>")
+        ).append(
+            $("<li>" + "<span>Locatie: </span>" + event.locatie + "</li>")
         )
     );
-    createMap(event);
-    $("html, body").scrollTop($("#detail").offset().top);
+    $("#detail").append($("<div class='disabled'></div>"));
+    if(event.toegankelijk_rolstoel){
+        $(".disabled").append(
+            $("<img src='image/wheelchair-icon.png'/>")
+        );
+    }
+    if(event.doventolk){
+        $(".disabled").append(
+            $("<img src='image/sign-language-icon.png'/>")
+        );
+    }
+    $("#detail").append($("<a id='toggleWC'>" + "WC" + "</a>"));
+    initMap(event);
+    $("html, body").animate({scrollTop: $("#detail").offset().top}, 500);
 }
 
-function createMap(event){
-    var map = initMap(map, event);
-
-    /*
-    //mobiele toiletten tonen op map:
-    map.data.loadGeoJson('https://storage.googleapis.com/mapsdevsite/json/google.json');
-    var ctaLayer = new google.maps.KmlLayer({
-        url: 'http://datatank.stad.gent/4/toerisme/mobieletoilettengentsefeesten.kml',
-        map: map
-    });
-    */
-}
-
-function initMap(map, event) {
+function initMap(event) {
     var locatie = {"lat": parseFloat(event.latitude),"lng": parseFloat(event.longitude)};
-    map = new google.maps.Map(document.getElementById("map-canvas"), {
+    googleMap = new google.maps.Map(document.getElementById("map-canvas"), {
         center: locatie,
         zoom: 16,
         mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -146,9 +165,63 @@ function initMap(map, event) {
 
     var marker = new google.maps.Marker({
         position: locatie,
-        map: map,
+        map: googleMap,
         title: event.titel
     });
+}
 
-    return map;
+$(document).ready(function() {
+    var wcMarkers = [];
+    $('#detail').on('click','#toggleWC', function(){
+        if(boolWC){
+            boolWC = false;
+            unmarkWC(wcMarkers);
+            $("#toggleWC").css("background-color", "#91aa9d");
+            $("#toggleWC").css("color", "#193441");
+            $("#toggleWC").css("border", "1px #193441 solid");
+        }
+        else{
+            boolWC = true;
+            wcMarkers = markWC();
+            $("#toggleWC").css("background-color", "#3e606f");
+            $("#toggleWC").css("color", "#fcfff5");
+            $("#toggleWC").css("border", "1px #fcfff5 solid");
+        }
+    });
+    $('#detail').on('click', '#backToTop', function(){
+        $("html, body").animate({scrollTop: 0}, 500);
+    });
+});
+
+function markWC(){
+    var wcMarkers = [];
+
+    var circle ={
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: 'red',
+        fillOpacity: .6,
+        scale: 4.5,
+        strokeColor: 'white',
+        strokeWeight: 1
+    };
+
+    $.getJSON("data/mobieletoilettengentsefeesten.geojson", function( toiletten ) {
+        $.each(toiletten.coordinates, function(l, locatie){
+            var wcMarker = new google.maps.Marker({
+                position: {"lat": parseFloat(locatie[1]), "lng": parseFloat(locatie[0])},    //coördinaten staan omgekeerd in geojson file
+                map: googleMap,
+                title: "WC",
+                icon: circle
+            })
+            wcMarkers.push(wcMarker)
+        });
+    });
+    return wcMarkers;
+}
+
+function unmarkWC(wcMarkers){
+    for (var i = 0; i < wcMarkers.length; i++ ) {
+        wcMarkers[i].setMap(null);
+    }
+    wcMarkers.length = 0;
 }
